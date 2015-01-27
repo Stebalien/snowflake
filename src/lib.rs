@@ -18,6 +18,7 @@
 use std::cell::UnsafeCell;
 use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
 use std::{u64, usize};
+use std::default::Default;
 
 static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 
@@ -69,6 +70,12 @@ impl Snowflake {
                 next_snowflake
             }
         })
+    }
+}
+
+impl Default for Snowflake {
+    fn default() -> Snowflake {
+        Snowflake::new()
     }
 }
 
