@@ -213,6 +213,7 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unstable</span>)]</span>
 <span class='doccomment'>//! A module for quickly generating IDs guarenteed to be unique within the process, for the</span>
@@ -234,14 +235,6 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>UnsafeCell</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicUsize</span>, <span class='ident'>ATOMIC_USIZE_INIT</span>, <span class='ident'>Ordering</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>u64</span>, <span class='ident'>usize</span>};
-
-
-<span class='doccomment'>/// An opaque unique id.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Snowflake</span> {
-    <span class='ident'>prefix</span>: <span class='ident'>usize</span>,
-    <span class='ident'>offset</span>: <span class='ident'>u64</span>,
-}
 
 <span class='kw'>static</span> <span class='ident'>GLOBAL_COUNTER</span>: <span class='ident'>AtomicUsize</span> <span class='op'>=</span> <span class='ident'>ATOMIC_USIZE_INIT</span>;
 
@@ -265,40 +258,49 @@
     })
 }
 
-<span class='doccomment'>/// Create a new unique ID.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate</span>
-<span class='doccomment'>/// your thrading model!</span>
-<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Snowflake</span> {
-    <span class='ident'>NEXT_LOCAL_SNOWFLAKE</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>snowflake</span><span class='op'>|</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>next_snowflake</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>snowflake</span>.<span class='ident'>get</span>();
-            <span class='kw'>if</span> <span class='ident'>next_snowflake</span>.<span class='ident'>offset</span> <span class='op'>==</span> <span class='ident'>u64</span>::<span class='ident'>MAX</span> {
-                <span class='op'>*</span><span class='ident'>snowflake</span>.<span class='ident'>get</span>() <span class='op'>=</span> <span class='ident'>Snowflake</span> {
-                    <span class='ident'>prefix</span>: <span class='ident'>next_global</span>(),
-                    <span class='ident'>offset</span>: <span class='number'>0</span>,
+<span class='doccomment'>/// An opaque unique id.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Snowflake</span> {
+    <span class='ident'>prefix</span>: <span class='ident'>usize</span>,
+    <span class='ident'>offset</span>: <span class='ident'>u64</span>,
+}
+
+<span class='kw'>impl</span> <span class='ident'>Snowflake</span> {
+    <span class='doccomment'>/// Create a new unique ID.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate</span>
+    <span class='doccomment'>/// your thrading model!</span>
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Snowflake</span> {
+        <span class='ident'>NEXT_LOCAL_SNOWFLAKE</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>snowflake</span><span class='op'>|</span> {
+            <span class='kw'>unsafe</span> {
+                <span class='kw'>let</span> <span class='ident'>next_snowflake</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>snowflake</span>.<span class='ident'>get</span>();
+                <span class='kw'>if</span> <span class='ident'>next_snowflake</span>.<span class='ident'>offset</span> <span class='op'>==</span> <span class='ident'>u64</span>::<span class='ident'>MAX</span> {
+                    <span class='op'>*</span><span class='ident'>snowflake</span>.<span class='ident'>get</span>() <span class='op'>=</span> <span class='ident'>Snowflake</span> {
+                        <span class='ident'>prefix</span>: <span class='ident'>next_global</span>(),
+                        <span class='ident'>offset</span>: <span class='number'>0</span>,
+                    }
+                } <span class='kw'>else</span> {
+                    (<span class='op'>*</span><span class='ident'>snowflake</span>.<span class='ident'>get</span>()).<span class='ident'>offset</span> <span class='op'>+=</span> <span class='number'>1</span>;
                 }
-            } <span class='kw'>else</span> {
-                (<span class='op'>*</span><span class='ident'>snowflake</span>.<span class='ident'>get</span>()).<span class='ident'>offset</span> <span class='op'>+=</span> <span class='number'>1</span>;
+                <span class='ident'>next_snowflake</span>
             }
-            <span class='ident'>next_snowflake</span>
-        }
-    })
+        })
+    }
 }
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>test</span>;
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>test</span>::<span class='ident'>Bencher</span>;
-    <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>next_global</span>, <span class='ident'>new</span>, <span class='ident'>Snowflake</span>};
+    <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>next_global</span>, <span class='ident'>Snowflake</span>};
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>u64</span>;
 
     <span class='comment'>// Glass box tests.</span>
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_snowflake_unthreaded</span>() {
-        <span class='kw'>let</span> <span class='ident'>first_snowflake</span> <span class='op'>=</span> <span class='ident'>new</span>();
+        <span class='kw'>let</span> <span class='ident'>first_snowflake</span> <span class='op'>=</span> <span class='ident'>Snowflake</span>::<span class='ident'>new</span>();
         <span class='comment'>// Not going to be able to count to u64::MAX</span>
         { <span class='comment'>// Ignore....</span>
             <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>NEXT_LOCAL_SNOWFLAKE</span>;
@@ -308,12 +310,12 @@
         } <span class='comment'>// Ignore...</span>
 
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> (<span class='ident'>u64</span>::<span class='ident'>MAX</span><span class='op'>-</span><span class='number'>11</span>)..(<span class='ident'>u64</span>::<span class='ident'>MAX</span>) {
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>new</span>() <span class='op'>==</span> <span class='ident'>Snowflake</span> { <span class='ident'>prefix</span>: <span class='ident'>first_snowflake</span>.<span class='ident'>prefix</span>, <span class='ident'>offset</span>: <span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>});
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>Snowflake</span>::<span class='ident'>new</span>() <span class='op'>==</span> <span class='ident'>Snowflake</span> { <span class='ident'>prefix</span>: <span class='ident'>first_snowflake</span>.<span class='ident'>prefix</span>, <span class='ident'>offset</span>: <span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>});
         }
-        <span class='kw'>let</span> <span class='ident'>next</span> <span class='op'>=</span> <span class='ident'>new</span>();
+        <span class='kw'>let</span> <span class='ident'>next</span> <span class='op'>=</span> <span class='ident'>Snowflake</span>::<span class='ident'>new</span>();
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>next</span>.<span class='ident'>prefix</span> <span class='op'>!=</span> <span class='ident'>first_snowflake</span>.<span class='ident'>prefix</span>);
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>next</span>.<span class='ident'>offset</span> <span class='op'>==</span> <span class='number'>0</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>new</span>() <span class='op'>==</span> <span class='ident'>Snowflake</span> { <span class='ident'>prefix</span>: <span class='ident'>next</span>.<span class='ident'>prefix</span>, <span class='ident'>offset</span>: <span class='number'>1</span> });
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>Snowflake</span>::<span class='ident'>new</span>() <span class='op'>==</span> <span class='ident'>Snowflake</span> { <span class='ident'>prefix</span>: <span class='ident'>next</span>.<span class='ident'>prefix</span>, <span class='ident'>offset</span>: <span class='number'>1</span> });
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -321,7 +323,7 @@
         <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>Future</span>;
         <span class='kw'>let</span> <span class='ident'>futures</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Future</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>map</span>(<span class='op'>|</span>_<span class='op'>|</span> {
             <span class='ident'>Future</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
-                <span class='kw'>let</span> <span class='ident'>snowflake</span> <span class='op'>=</span> <span class='ident'>new</span>();
+                <span class='kw'>let</span> <span class='ident'>snowflake</span> <span class='op'>=</span> <span class='ident'>Snowflake</span>::<span class='ident'>new</span>();
                 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>snowflake</span>.<span class='ident'>offset</span>, <span class='number'>0</span>);
                 <span class='ident'>snowflake</span>.<span class='ident'>prefix</span>
             })
@@ -363,7 +365,7 @@
     <span class='attribute'>#[<span class='ident'>bench</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>bench_snowflake</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
         <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
-            <span class='ident'>new</span>();
+            <span class='ident'>Snowflake</span>::<span class='ident'>new</span>();
         });
     }
 
@@ -378,7 +380,7 @@
                 <span class='kw'>let</span> <span class='ident'>tx</span> <span class='op'>=</span> <span class='ident'>tx</span>.<span class='ident'>clone</span>();
                 <span class='ident'>pool</span>.<span class='ident'>execute</span>(<span class='kw'>move</span> <span class='op'>||</span> {
                     <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>1000</span> {
-                        <span class='ident'>new</span>();
+                        <span class='ident'>Snowflake</span>::<span class='ident'>new</span>();
                     }
                     <span class='ident'>tx</span>.<span class='ident'>send</span>(()).<span class='ident'>unwrap</span>();
                 });

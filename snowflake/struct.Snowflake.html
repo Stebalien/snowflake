@@ -26,7 +26,7 @@
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>snowflake</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Snowflake.html' title='An opaque unique id.'>Snowflake</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.new.html' title='Create a new unique ID.'>new</a></div>
+        <p class='location'><a href='index.html'>snowflake</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Snowflake.html' title='An opaque unique id.'>Snowflake</a></div>
     </section>
 
     <nav class="sub">
@@ -44,11 +44,16 @@
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>snowflake</a>::<wbr><a class='struct' href=''>Snowflake</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-12' href='../src/snowflake/lib.rs.html#25-28'>[src]</a></span></h1>
+        </span><a id='src-172' href='../src/snowflake/lib.rs.html#46-49'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Snowflake {
     // some fields omitted
 }</pre><div class='docblock'><p>An opaque unique id.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a></code></h3><div class='impl-items'><h4 id='method.assert_receiver_is_total_eq' class='tymethod'><a class='stability Unstable' title='Unstable'></a><code>fn <a href='#tymethod.assert_receiver_is_total_eq' class='fnname'>assert_receiver_is_total_eq</a>(&amp;self)</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl <a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a></code></h4>
+<div class='docblock'><p>Create a new unique ID.</p>
+
+<p><strong>panics</strong> if there are no more unique IDs available. If this happens, go home and reevaluate
+your thrading model!</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a></code></h3><div class='impl-items'><h4 id='method.assert_receiver_is_total_eq' class='tymethod'><a class='stability Unstable' title='Unstable'></a><code>fn <a href='#tymethod.assert_receiver_is_total_eq' class='fnname'>assert_receiver_is_total_eq</a>(&amp;self)</code></h4>
 </div><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a></code></h3><div class='impl-items'><h4 id='method.eq' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a>) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 <h4 id='method.ne' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a>) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 </div><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl <a class='trait' href='http://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../snowflake/struct.Snowflake.html' title='snowflake::Snowflake'>Snowflake</a></code></h3><div class='impl-items'></div></section>
