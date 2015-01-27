@@ -19,14 +19,6 @@ use std::cell::UnsafeCell;
 use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
 use std::{u64, usize};
 
-
-/// An opaque unique id.
-#[derive(Copy, PartialEq, Eq)]
-pub struct Snowflake {
-    prefix: usize,
-    offset: u64,
-}
-
 static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 
 fn next_global() -> usize {
@@ -49,40 +41,49 @@ thread_local! {
     })
 }
 
-/// Create a new unique ID.
-///
-/// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate
-/// your thrading model!
-#[inline]
-pub fn new() -> Snowflake {
-    NEXT_LOCAL_SNOWFLAKE.with(|snowflake| {
-        unsafe {
-            let next_snowflake = *snowflake.get();
-            if next_snowflake.offset == u64::MAX {
-                *snowflake.get() = Snowflake {
-                    prefix: next_global(),
-                    offset: 0,
+/// An opaque unique id.
+#[derive(Copy, PartialEq, Eq)]
+pub struct Snowflake {
+    prefix: usize,
+    offset: u64,
+}
+
+impl Snowflake {
+    /// Create a new unique ID.
+    ///
+    /// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate
+    /// your thrading model!
+    #[inline]
+    pub fn new() -> Snowflake {
+        NEXT_LOCAL_SNOWFLAKE.with(|snowflake| {
+            unsafe {
+                let next_snowflake = *snowflake.get();
+                if next_snowflake.offset == u64::MAX {
+                    *snowflake.get() = Snowflake {
+                        prefix: next_global(),
+                        offset: 0,
+                    }
+                } else {
+                    (*snowflake.get()).offset += 1;
                 }
-            } else {
-                (*snowflake.get()).offset += 1;
+                next_snowflake
             }
-            next_snowflake
-        }
-    })
+        })
+    }
 }
 
 #[cfg(test)]
 mod test {
     extern crate test;
     use self::test::Bencher;
-    use super::{next_global, new, Snowflake};
+    use super::{next_global, Snowflake};
     use std::u64;
 
     // Glass box tests.
 
     #[test]
     fn test_snowflake_unthreaded() {
-        let first_snowflake = new();
+        let first_snowflake = Snowflake::new();
         // Not going to be able to count to u64::MAX
         { // Ignore....
             use super::NEXT_LOCAL_SNOWFLAKE;
@@ -92,12 +93,12 @@ mod test {
         } // Ignore...
 
         for i in (u64::MAX-11)..(u64::MAX) {
-            assert!(new() == Snowflake { prefix: first_snowflake.prefix, offset: i+1});
+            assert!(Snowflake::new() == Snowflake { prefix: first_snowflake.prefix, offset: i+1});
         }
-        let next = new();
+        let next = Snowflake::new();
         assert!(next.prefix != first_snowflake.prefix);
         assert!(next.offset == 0);
-        assert!(new() == Snowflake { prefix: next.prefix, offset: 1 });
+        assert!(Snowflake::new() == Snowflake { prefix: next.prefix, offset: 1 });
     }
 
     #[test]
@@ -105,7 +106,7 @@ mod test {
         use std::sync::Future;
         let futures: Vec<Future<usize>> = (0..10).map(|_| {
             Future::spawn(move || {
-                let snowflake = new();
+                let snowflake = Snowflake::new();
                 assert_eq!(snowflake.offset, 0);
                 snowflake.prefix
             })
@@ -147,7 +148,7 @@ mod test {
     #[bench]
     fn bench_snowflake(b: &mut Bencher) {
         b.iter(|| {
-            new();
+            Snowflake::new();
         });
     }
 
@@ -162,7 +163,7 @@ mod test {
                 let tx = tx.clone();
                 pool.execute(move || {
                     for _ in 0..1000 {
-                        new();
+                        Snowflake::new();
                     }
                     tx.send(()).unwrap();
                 });
