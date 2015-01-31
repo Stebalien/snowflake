@@ -81,6 +81,7 @@ impl Default for ProcessUniqueId {
 mod test {
     extern crate test;
     extern crate time;
+    extern crate uuid;
     use self::test::Bencher;
     use super::{next_global, ProcessUniqueId};
     use std::u64;
@@ -171,6 +172,14 @@ mod test {
         use self::time::get_time;
         b.iter(|| {
             let _ = get_time();
+        });
+    }
+
+    #[bench]
+    fn bench_uuid(b: &mut Bencher) {
+        use self::uuid::Uuid;
+        b.iter(|| {
+            Uuid::new_v4();
         });
     }
 
