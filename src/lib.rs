@@ -1,11 +1,11 @@
 #![feature(core)]
 #![cfg_attr(test, feature(test, std_misc))]
-//! A module for quickly generating IDs guaranteed to be unique within the process, for the
-//! lifetime of the process.
+//! A module for quickly generating IDs guaranteed to be unique within the current process, for the
+//! lifetime of the current process.
 //!
 //! 1. This module should be highly performant even on highly concurrent systems.
 //! 2. While this module can run out of unique IDs, this is very unlikely assuming a sane threading
-//!    model and is will panic rather than reusing unique potentially in-use IDs. 
+//!    model and will panic rather than potentially reusing unique IDs. 
 //!
 //! # Limits
 //!
