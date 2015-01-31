@@ -28,7 +28,8 @@ thread_local! {
 /// Process unique IDs are guaranteed to be unique within the current process, for the lifetime of
 /// the current process.
 ///
-/// 1. ID creation should be highly performant even on highly concurrent systems.
+/// 1. ID creation should be highly performant even on highly concurrent systems. It's MUCH faster
+///    than using random/time based IDs (but, on the other hand, only unique within a process).
 /// 2. While this crate can run out of process unique IDs, this is very unlikely assuming a sane
 ///    threading model and will panic rather than potentially reusing unique IDs. 
 ///
@@ -79,6 +80,7 @@ impl Default for ProcessUniqueId {
 #[cfg(test)]
 mod test {
     extern crate test;
+    extern crate time;
     use self::test::Bencher;
     use super::{next_global, ProcessUniqueId};
     use std::u64;
@@ -153,6 +155,22 @@ mod test {
     fn bench_unique_id(b: &mut Bencher) {
         b.iter(|| {
             ProcessUniqueId::new();
+        });
+    }
+
+    #[bench]
+    fn bench_random_id(b: &mut Bencher) {
+        use std::rand::random;
+        b.iter(|| {
+            let _: u64 = random();
+        });
+    }
+
+    #[bench]
+    fn bench_time_id(b: &mut Bencher) {
+        use self::time::get_time;
+        b.iter(|| {
+            let _ = get_time();
         });
     }
 

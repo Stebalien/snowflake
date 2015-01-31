@@ -12,3 +12,5 @@ repository = "https://github.com/Stebalien/snowflake"
 homepage = "https://github.com/Stebalien/snowflake"
 documentation = "https://stebalien.github.io/snowflake/snowflake"
 
+[dev-dependencies]
+time = "*"
