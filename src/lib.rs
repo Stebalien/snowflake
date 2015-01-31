@@ -54,7 +54,7 @@ impl Snowflake {
     /// Create a new unique ID.
     ///
     /// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate
-    /// your thrading model!
+    /// your threading model!
     #[inline]
     pub fn new() -> Snowflake {
         NEXT_LOCAL_SNOWFLAKE.with(|snowflake| {
