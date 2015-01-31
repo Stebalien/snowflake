@@ -44,14 +44,15 @@
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>snowflake</a>::<wbr><a class='struct' href=''>ProcessUniqueId</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-175' href='../src/snowflake/process_unique_id.rs.html#44-47'>[src]</a></span></h1>
+        </span><a id='src-175' href='../src/snowflake/process_unique_id.rs.html#45-48'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ProcessUniqueId {
     // some fields omitted
 }</pre><div class='docblock'><p>Process unique IDs are guaranteed to be unique within the current process, for the lifetime of
 the current process.</p>
 
 <ol>
-<li>ID creation should be highly performant even on highly concurrent systems.</li>
+<li>ID creation should be highly performant even on highly concurrent systems. It&#39;s MUCH faster
+than using random/time based IDs (but, on the other hand, only unique within a process).</li>
 <li>While this crate can run out of process unique IDs, this is very unlikely assuming a sane
 threading model and will panic rather than potentially reusing unique IDs. </li>
 </ol>

@@ -218,6 +218,24 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>UnsafeCell</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicUsize</span>, <span class='ident'>ATOMIC_USIZE_INIT</span>, <span class='ident'>Ordering</span>};
@@ -249,7 +267,8 @@
 <span class='doccomment'>/// Process unique IDs are guaranteed to be unique within the current process, for the lifetime of</span>
 <span class='doccomment'>/// the current process.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// 1. ID creation should be highly performant even on highly concurrent systems.</span>
+<span class='doccomment'>/// 1. ID creation should be highly performant even on highly concurrent systems. It&#39;s MUCH faster</span>
+<span class='doccomment'>///    than using random/time based IDs (but, on the other hand, only unique within a process).</span>
 <span class='doccomment'>/// 2. While this crate can run out of process unique IDs, this is very unlikely assuming a sane</span>
 <span class='doccomment'>///    threading model and will panic rather than potentially reusing unique IDs. </span>
 <span class='doccomment'>///</span>
@@ -300,6 +319,7 @@
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>test</span> {
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>test</span>;
+    <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>test</span>::<span class='ident'>Bencher</span>;
     <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>next_global</span>, <span class='ident'>ProcessUniqueId</span>};
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>u64</span>;
@@ -374,6 +394,22 @@
     <span class='kw'>fn</span> <span class='ident'>bench_unique_id</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
         <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
             <span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>();
+        });
+    }
+
+    <span class='attribute'>#[<span class='ident'>bench</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>bench_random_id</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
+        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>rand</span>::<span class='ident'>random</span>;
+        <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
+            <span class='kw'>let</span> _: <span class='ident'>u64</span> <span class='op'>=</span> <span class='ident'>random</span>();
+        });
+    }
+
+    <span class='attribute'>#[<span class='ident'>bench</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>bench_time_id</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
+        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>time</span>::<span class='ident'>get_time</span>;
+        <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
+            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>get_time</span>();
         });
     }
 
