@@ -279,7 +279,7 @@
     <span class='doccomment'>/// Create a new unique ID.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate</span>
-    <span class='doccomment'>/// your thrading model!</span>
+    <span class='doccomment'>/// your threading model!</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Snowflake</span> {
         <span class='ident'>NEXT_LOCAL_SNOWFLAKE</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>snowflake</span><span class='op'>|</span> {
