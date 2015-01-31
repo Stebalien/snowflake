@@ -236,6 +236,15 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>UnsafeCell</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicUsize</span>, <span class='ident'>ATOMIC_USIZE_INIT</span>, <span class='ident'>Ordering</span>};
@@ -320,6 +329,7 @@
 <span class='kw'>mod</span> <span class='ident'>test</span> {
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>test</span>;
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
+    <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>uuid</span>;
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>test</span>::<span class='ident'>Bencher</span>;
     <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>next_global</span>, <span class='ident'>ProcessUniqueId</span>};
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>u64</span>;
@@ -410,6 +420,14 @@
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>time</span>::<span class='ident'>get_time</span>;
         <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
             <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>get_time</span>();
+        });
+    }
+
+    <span class='attribute'>#[<span class='ident'>bench</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>bench_uuid</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
+        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>uuid</span>::<span class='ident'>Uuid</span>;
+        <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
+            <span class='ident'>Uuid</span>::<span class='ident'>new_v4</span>();
         });
     }
 
