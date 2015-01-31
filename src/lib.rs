@@ -1,4 +1,5 @@
-#![allow(unstable)]
+#![feature(core)]
+#![cfg_attr(test, feature(test, std_misc))]
 //! A module for quickly generating IDs guaranteed to be unique within the process, for the
 //! lifetime of the process.
 //!
