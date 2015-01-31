@@ -45,13 +45,13 @@
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
         </span><a id='src-0' href='../src/snowflake/lib.rs.html#1-182'>[src]</a></span></h1>
-<div class='docblock'><p>A module for quickly generating IDs guaranteed to be unique within the process, for the
-lifetime of the process.</p>
+<div class='docblock'><p>A module for quickly generating IDs guaranteed to be unique within the current process, for the
+lifetime of the current process.</p>
 
 <ol>
 <li>This module should be highly performant even on highly concurrent systems.</li>
 <li>While this module can run out of unique IDs, this is very unlikely assuming a sane threading
-model and is will panic rather than reusing unique potentially in-use IDs. </li>
+model and will panic rather than potentially reusing unique IDs. </li>
 </ol>
 
 <h1 id="limits" class='section-header'><a

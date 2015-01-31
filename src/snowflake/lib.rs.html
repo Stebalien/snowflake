@@ -225,12 +225,12 @@
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>core</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>test</span>, <span class='ident'>feature</span>(<span class='ident'>test</span>, <span class='ident'>std_misc</span>))]</span>
-<span class='doccomment'>//! A module for quickly generating IDs guaranteed to be unique within the process, for the</span>
-<span class='doccomment'>//! lifetime of the process.</span>
+<span class='doccomment'>//! A module for quickly generating IDs guaranteed to be unique within the current process, for the</span>
+<span class='doccomment'>//! lifetime of the current process.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! 1. This module should be highly performant even on highly concurrent systems.</span>
 <span class='doccomment'>//! 2. While this module can run out of unique IDs, this is very unlikely assuming a sane threading</span>
-<span class='doccomment'>//!    model and is will panic rather than reusing unique potentially in-use IDs. </span>
+<span class='doccomment'>//!    model and will panic rather than potentially reusing unique IDs. </span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! # Limits</span>
 <span class='doccomment'>//!</span>
