@@ -1,5 +1,4 @@
-#![feature(core)]
-#![cfg_attr(test, feature(test, std_misc, rand))]
+#![cfg_attr(test, feature(core, test, std_misc))]
 //! A crate for quickly generating unique IDs with guaranteed properties.
 //!
 //! This crate currently includes guaranteed process unique IDs but may include new ID types in the

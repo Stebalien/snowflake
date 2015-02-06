@@ -82,6 +82,7 @@ mod test {
     extern crate test;
     extern crate time;
     extern crate uuid;
+    extern crate rand;
     use self::test::Bencher;
     use super::{next_global, ProcessUniqueId};
     use std::u64;
@@ -161,7 +162,7 @@ mod test {
 
     #[bench]
     fn bench_random_id(b: &mut Bencher) {
-        use std::rand::random;
+        use self::rand::random;
         b.iter(|| {
             let _: u64 = random();
         });

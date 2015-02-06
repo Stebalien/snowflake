@@ -15,3 +15,4 @@ documentation = "https://stebalien.github.io/snowflake/snowflake"
 [dev-dependencies]
 time = "*"
 uuid = "*"
+rand = "*"
