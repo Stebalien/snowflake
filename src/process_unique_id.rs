@@ -53,7 +53,7 @@ impl ProcessUniqueId {
     /// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate
     /// your threading model!
     #[inline]
-    pub fn new() -> ProcessUniqueId {
+    pub fn new() -> Self {
         NEXT_LOCAL_UNIQUE_ID.with(|unique_id| {
             unsafe {
                 let next_unique_id = *unique_id.get();
@@ -72,7 +72,7 @@ impl ProcessUniqueId {
 }
 
 impl Default for ProcessUniqueId {
-    fn default() -> ProcessUniqueId {
+    fn default() -> Self {
         ProcessUniqueId::new()
     }
 }
