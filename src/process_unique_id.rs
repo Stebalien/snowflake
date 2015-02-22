@@ -137,7 +137,7 @@ mod test {
     fn bench_next_global_threaded(b: &mut Bencher) {
         use std::sync::TaskPool;
         use std::sync::mpsc::channel;
-        let pool = TaskPool::new(4us);
+        let pool = TaskPool::new(4usize);
         b.iter(|| {
             let (tx, rx) = channel();
             for _ in 0..4 {
@@ -188,7 +188,7 @@ mod test {
     fn bench_unique_id_threaded(b: &mut Bencher) {
         use std::sync::TaskPool;
         use std::sync::mpsc::channel;
-        let pool = TaskPool::new(4us);
+        let pool = TaskPool::new(4usize);
         b.iter(|| {
             let (tx, rx) = channel();
             for _ in 0..4 {
