@@ -245,7 +245,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>UnsafeCell</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicUsize</span>, <span class='ident'>ATOMIC_USIZE_INIT</span>, <span class='ident'>Ordering</span>};
@@ -332,6 +331,9 @@
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>uuid</span>;
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
+    <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>threadpool</span>;
+    <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>threadpool</span>::<span class='ident'>ThreadPool</span>;
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::<span class='ident'>channel</span>;
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>test</span>::<span class='ident'>Bencher</span>;
     <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>next_global</span>, <span class='ident'>ProcessUniqueId</span>};
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>u64</span>;
@@ -384,9 +386,7 @@
 
     <span class='attribute'>#[<span class='ident'>bench</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>bench_next_global_threaded</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
-        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>TaskPool</span>;
-        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::<span class='ident'>channel</span>;
-        <span class='kw'>let</span> <span class='ident'>pool</span> <span class='op'>=</span> <span class='ident'>TaskPool</span>::<span class='ident'>new</span>(<span class='number'>4usize</span>);
+        <span class='kw'>let</span> <span class='ident'>pool</span> <span class='op'>=</span> <span class='ident'>ThreadPool</span>::<span class='ident'>new</span>(<span class='number'>4usize</span>);
         <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
             <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>channel</span>();
             <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>4</span> {
@@ -435,9 +435,7 @@
 
     <span class='attribute'>#[<span class='ident'>bench</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>bench_unique_id_threaded</span>(<span class='ident'>b</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
-        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>TaskPool</span>;
-        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::<span class='ident'>channel</span>;
-        <span class='kw'>let</span> <span class='ident'>pool</span> <span class='op'>=</span> <span class='ident'>TaskPool</span>::<span class='ident'>new</span>(<span class='number'>4usize</span>);
+        <span class='kw'>let</span> <span class='ident'>pool</span> <span class='op'>=</span> <span class='ident'>ThreadPool</span>::<span class='ident'>new</span>(<span class='number'>4usize</span>);
         <span class='ident'>b</span>.<span class='ident'>iter</span>(<span class='op'>||</span> {
             <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>channel</span>();
             <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>4</span> {
