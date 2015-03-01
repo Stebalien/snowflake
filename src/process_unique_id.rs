@@ -83,6 +83,9 @@ mod test {
     extern crate time;
     extern crate uuid;
     extern crate rand;
+    extern crate threadpool;
+    use self::threadpool::ThreadPool;
+    use std::sync::mpsc::channel;
     use self::test::Bencher;
     use super::{next_global, ProcessUniqueId};
     use std::u64;
@@ -135,9 +138,7 @@ mod test {
 
     #[bench]
     fn bench_next_global_threaded(b: &mut Bencher) {
-        use std::sync::TaskPool;
-        use std::sync::mpsc::channel;
-        let pool = TaskPool::new(4usize);
+        let pool = ThreadPool::new(4usize);
         b.iter(|| {
             let (tx, rx) = channel();
             for _ in 0..4 {
@@ -186,9 +187,7 @@ mod test {
 
     #[bench]
     fn bench_unique_id_threaded(b: &mut Bencher) {
-        use std::sync::TaskPool;
-        use std::sync::mpsc::channel;
-        let pool = TaskPool::new(4usize);
+        let pool = ThreadPool::new(4usize);
         b.iter(|| {
             let (tx, rx) = channel();
             for _ in 0..4 {
