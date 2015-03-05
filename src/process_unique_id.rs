@@ -1,4 +1,5 @@
 use std::cell::UnsafeCell;
+
 use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
 use std::{u64, usize};
 use std::default::Default;
@@ -72,6 +73,7 @@ impl ProcessUniqueId {
 }
 
 impl Default for ProcessUniqueId {
+    #[inline]
     fn default() -> Self {
         ProcessUniqueId::new()
     }
