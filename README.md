@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Stebalien/snowflake.svg?branch=master)](https://travis-ci.org/Stebalien/snowflake)
+
 A crate for quickly generating unique IDs with guaranteed properties. This
 library is completely unrelated to twitter's snowflake library.
 
