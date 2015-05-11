@@ -292,7 +292,7 @@
 <span class='doccomment'>/// IDs in a reasonable amount of time is to run a 32bit system, spawn 2^32 threads, and claim one</span>
 <span class='doccomment'>/// ID on each thread. You might be able to do this on a 64bit system but it would take a while...</span>
 <span class='doccomment'>/// TL; DR: Don&#39;t create unique IDs from over 4 billion different threads on a 32bit system.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>Hash</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ProcessUniqueId</span> {
     <span class='ident'>prefix</span>: <span class='ident'>usize</span>,
     <span class='ident'>offset</span>: <span class='ident'>u64</span>,
