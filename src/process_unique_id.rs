@@ -19,6 +19,7 @@ fn next_global() -> usize {
     }
 }
 
+// NOTE: We could use a Cell (not unsafe) but this is slightly faster.
 thread_local! {
     static NEXT_LOCAL_UNIQUE_ID: UnsafeCell<ProcessUniqueId> = UnsafeCell::new(ProcessUniqueId {
         prefix: next_global(),
@@ -57,15 +58,19 @@ impl ProcessUniqueId {
     pub fn new() -> Self {
         NEXT_LOCAL_UNIQUE_ID.with(|unique_id| {
             unsafe {
+                // NOTE: Checked ops are slower than manually checking... (WTF?)
                 let next_unique_id = *unique_id.get();
-                if next_unique_id.offset == u64::MAX {
-                    *unique_id.get() = ProcessUniqueId {
+                (*unique_id.get()) = if next_unique_id.offset == u64::MAX {
+                    ProcessUniqueId {
                         prefix: next_global(),
                         offset: 0,
                     }
                 } else {
-                    (*unique_id.get()).offset += 1;
-                }
+                    ProcessUniqueId {
+                        prefix: next_unique_id.prefix,
+                        offset: next_unique_id.offset + 1,
+                    }
+                };
                 next_unique_id
             }
         })
