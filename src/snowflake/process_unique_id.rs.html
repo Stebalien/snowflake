@@ -252,6 +252,13 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>UnsafeCell</span>;
 
@@ -347,6 +354,7 @@
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
     <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>threadpool</span>;
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>threadpool</span>::<span class='ident'>ThreadPool</span>;
+    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::<span class='ident'>channel</span>;
     <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>test</span>::<span class='ident'>Bencher</span>;
     <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>next_global</span>, <span class='ident'>ProcessUniqueId</span>};
@@ -376,15 +384,21 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_unique_id_threaded</span>() {
-        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>Future</span>;
-        <span class='kw'>let</span> <span class='ident'>futures</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Future</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>map</span>(<span class='op'>|</span>_<span class='op'>|</span> {
-            <span class='ident'>Future</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
+        <span class='kw'>let</span> <span class='ident'>threads</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>map</span>(<span class='op'>|</span>_<span class='op'>|</span> {
+            <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
+                <span class='ident'>thread</span>::<span class='ident'>park</span>();
                 <span class='kw'>let</span> <span class='ident'>unique_id</span> <span class='op'>=</span> <span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>();
                 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>unique_id</span>.<span class='ident'>offset</span>, <span class='number'>0</span>);
                 <span class='ident'>unique_id</span>.<span class='ident'>prefix</span>
             })
         }).<span class='ident'>collect</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>results</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>futures</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>into_inner</span>()).<span class='ident'>collect</span>();
+
+        <span class='comment'>// Start them all at once.</span>
+        <span class='kw'>for</span> <span class='ident'>thread</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>threads</span> { <span class='ident'>thread</span>.<span class='ident'>thread</span>().<span class='ident'>unpark</span>(); }
+
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>results</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>threads</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span>{
+            <span class='ident'>t</span>.<span class='ident'>join</span>().<span class='ident'>unwrap</span>()
+        }).<span class='ident'>collect</span>();
         <span class='ident'>results</span>.<span class='ident'>sort</span>();
         <span class='kw'>let</span> <span class='ident'>old_len</span> <span class='op'>=</span> <span class='ident'>results</span>.<span class='ident'>len</span>();
         <span class='ident'>results</span>.<span class='ident'>dedup</span>();
