@@ -92,6 +92,7 @@ mod test {
     extern crate rand;
     extern crate threadpool;
     use self::threadpool::ThreadPool;
+    use std::thread;
     use std::sync::mpsc::channel;
     use self::test::Bencher;
     use super::{next_global, ProcessUniqueId};
@@ -121,15 +122,21 @@ mod test {
 
     #[test]
     fn test_unique_id_threaded() {
-        use std::sync::Future;
-        let futures: Vec<Future<usize>> = (0..10).map(|_| {
-            Future::spawn(move || {
+        let threads: Vec<_> = (0..10).map(|_| {
+            thread::spawn(move || {
+                thread::park();
                 let unique_id = ProcessUniqueId::new();
                 assert_eq!(unique_id.offset, 0);
                 unique_id.prefix
             })
         }).collect();
-        let mut results: Vec<usize> = futures.into_iter().map(|x| x.into_inner()).collect();
+
+        // Start them all at once.
+        for thread in &threads { thread.thread().unpark(); }
+
+        let mut results: Vec<_> = threads.into_iter().map(|t|{
+            t.join().unwrap()
+        }).collect();
         results.sort();
         let old_len = results.len();
         results.dedup();
