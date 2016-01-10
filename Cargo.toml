@@ -1,11 +1,11 @@
 [package]
 
 name = "snowflake"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Steven Allen <steven@stebalien.com>"]
 
 description = "A module for generating guaranteed process unique IDs."
-license = "MIT"
+license = "MIT/Apache-2.0"
 readme = "README.md"
 
 repository = "https://github.com/Stebalien/snowflake"
