@@ -267,6 +267,18 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2016 Steven Allen</span>
 <span class='comment'>//</span>
@@ -286,7 +298,8 @@
 <span class='kw'>fn</span> <span class='ident'>next_global</span>() <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>prev</span> <span class='op'>=</span> <span class='ident'>GLOBAL_COUNTER</span>.<span class='ident'>load</span>(<span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>);
     <span class='kw'>loop</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>prev</span> <span class='op'>&lt;</span> <span class='ident'>usize</span>::<span class='ident'>MAX</span>, <span class='string'>&quot;Snow Crash: Go home and reevaluate your threading model!&quot;</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>prev</span> <span class='op'>&lt;</span> <span class='ident'>usize</span>::<span class='ident'>MAX</span>,
+                <span class='string'>&quot;Snow Crash: Go home and reevaluate your threading model!&quot;</span>);
         <span class='kw'>let</span> <span class='ident'>old_value</span> <span class='op'>=</span> <span class='ident'>GLOBAL_COUNTER</span>.<span class='ident'>compare_and_swap</span>(<span class='ident'>prev</span>, <span class='ident'>prev</span> <span class='op'>+</span> <span class='number'>1</span>, <span class='ident'>Ordering</span>::<span class='ident'>Relaxed</span>);
         <span class='kw'>if</span> <span class='ident'>old_value</span> <span class='op'>==</span> <span class='ident'>prev</span> {
             <span class='kw'>return</span> <span class='ident'>prev</span>;
@@ -310,7 +323,7 @@
 <span class='doccomment'>/// 1. ID creation should be highly performant even on highly concurrent systems. It&#39;s MUCH faster</span>
 <span class='doccomment'>///    than using random/time based IDs (but, on the other hand, only unique within a process).</span>
 <span class='doccomment'>/// 2. While this crate can run out of process unique IDs, this is very unlikely assuming a sane</span>
-<span class='doccomment'>///    threading model and will panic rather than potentially reusing unique IDs. </span>
+<span class='doccomment'>///    threading model and will panic rather than potentially reusing unique IDs.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Limits</span>
 <span class='doccomment'>///</span>
@@ -329,8 +342,8 @@
 <span class='kw'>impl</span> <span class='ident'>ProcessUniqueId</span> {
     <span class='doccomment'>/// Create a new unique ID.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate</span>
-    <span class='doccomment'>/// your threading model!</span>
+    <span class='doccomment'>/// **panics** if there are no more unique IDs available. If this happens, go home and</span>
+    <span class='doccomment'>/// reevaluate your threading model!</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
         <span class='ident'>NEXT_LOCAL_UNIQUE_ID</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>unique_id</span><span class='op'>|</span> {
@@ -381,20 +394,29 @@
     <span class='kw'>fn</span> <span class='ident'>test_unique_id_unthreaded</span>() {
         <span class='kw'>let</span> <span class='ident'>first_unique_id</span> <span class='op'>=</span> <span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>();
         <span class='comment'>// Not going to be able to count to u64::MAX</span>
-        { <span class='comment'>// Ignore....</span>
+        {
+            <span class='comment'>// Ignore....</span>
             <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>NEXT_LOCAL_UNIQUE_ID</span>;
             <span class='ident'>NEXT_LOCAL_UNIQUE_ID</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>unique_id</span><span class='op'>|</span> {
-                <span class='kw'>unsafe</span> { (<span class='op'>*</span><span class='ident'>unique_id</span>.<span class='ident'>get</span>()).<span class='ident'>offset</span> <span class='op'>=</span> <span class='ident'>u64</span>::<span class='ident'>MAX</span><span class='op'>-</span><span class='number'>10</span> }
+                <span class='kw'>unsafe</span> { (<span class='op'>*</span><span class='ident'>unique_id</span>.<span class='ident'>get</span>()).<span class='ident'>offset</span> <span class='op'>=</span> <span class='ident'>u64</span>::<span class='ident'>MAX</span> <span class='op'>-</span> <span class='number'>10</span> }
             });
         } <span class='comment'>// Ignore...</span>
 
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> (<span class='ident'>u64</span>::<span class='ident'>MAX</span><span class='op'>-</span><span class='number'>11</span>)..(<span class='ident'>u64</span>::<span class='ident'>MAX</span>) {
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>() <span class='op'>==</span> <span class='ident'>ProcessUniqueId</span> { <span class='ident'>prefix</span>: <span class='ident'>first_unique_id</span>.<span class='ident'>prefix</span>, <span class='ident'>offset</span>: <span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>});
+        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> (<span class='ident'>u64</span>::<span class='ident'>MAX</span> <span class='op'>-</span> <span class='number'>11</span>)..(<span class='ident'>u64</span>::<span class='ident'>MAX</span>) {
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>() <span class='op'>==</span>
+                    <span class='ident'>ProcessUniqueId</span> {
+                <span class='ident'>prefix</span>: <span class='ident'>first_unique_id</span>.<span class='ident'>prefix</span>,
+                <span class='ident'>offset</span>: <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>,
+            });
         }
         <span class='kw'>let</span> <span class='ident'>next</span> <span class='op'>=</span> <span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>();
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>next</span>.<span class='ident'>prefix</span> <span class='op'>!=</span> <span class='ident'>first_unique_id</span>.<span class='ident'>prefix</span>);
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>next</span>.<span class='ident'>offset</span> <span class='op'>==</span> <span class='number'>0</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>() <span class='op'>==</span> <span class='ident'>ProcessUniqueId</span> { <span class='ident'>prefix</span>: <span class='ident'>next</span>.<span class='ident'>prefix</span>, <span class='ident'>offset</span>: <span class='number'>1</span> });
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>() <span class='op'>==</span>
+                <span class='ident'>ProcessUniqueId</span> {
+            <span class='ident'>prefix</span>: <span class='ident'>next</span>.<span class='ident'>prefix</span>,
+            <span class='ident'>offset</span>: <span class='number'>1</span>,
+        });
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -409,11 +431,13 @@
         }).<span class='ident'>collect</span>();
 
         <span class='comment'>// Start them all at once.</span>
-        <span class='kw'>for</span> <span class='ident'>thread</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>threads</span> { <span class='ident'>thread</span>.<span class='ident'>thread</span>().<span class='ident'>unpark</span>(); }
+        <span class='kw'>for</span> <span class='ident'>thread</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>threads</span> {
+            <span class='ident'>thread</span>.<span class='ident'>thread</span>().<span class='ident'>unpark</span>();
+        }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>results</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>threads</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span>{
-            <span class='ident'>t</span>.<span class='ident'>join</span>().<span class='ident'>unwrap</span>()
-        }).<span class='ident'>collect</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>results</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>threads</span>.<span class='ident'>into_iter</span>()
+                                         .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span> <span class='ident'>t</span>.<span class='ident'>join</span>().<span class='ident'>unwrap</span>())
+                                         .<span class='ident'>collect</span>();
         <span class='ident'>results</span>.<span class='ident'>sort</span>();
         <span class='kw'>let</span> <span class='ident'>old_len</span> <span class='op'>=</span> <span class='ident'>results</span>.<span class='ident'>len</span>();
         <span class='ident'>results</span>.<span class='ident'>dedup</span>();

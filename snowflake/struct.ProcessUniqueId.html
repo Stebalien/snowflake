@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-19' class='srclink' href='../src/snowflake/process_unique_id.rs.html#54-57' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-19' class='srclink' href='../src/snowflake/process_unique_id.rs.html#55-58' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ProcessUniqueId {
     // some fields omitted
 }</pre><div class='docblock'><p>Process unique IDs are guaranteed to be unique within the current process, for the lifetime of
@@ -56,7 +56,7 @@ the current process.</p>
 <li>ID creation should be highly performant even on highly concurrent systems. It&#39;s MUCH faster
 than using random/time based IDs (but, on the other hand, only unique within a process).</li>
 <li>While this crate can run out of process unique IDs, this is very unlikely assuming a sane
-threading model and will panic rather than potentially reusing unique IDs. </li>
+threading model and will panic rather than potentially reusing unique IDs.</li>
 </ol>
 
 <h1 id='limits' class='section-header'><a href='#limits'>Limits</a></h1>
@@ -69,8 +69,8 @@ TL; DR: Don&#39;t create unique IDs from over 4 billion different threads on a 3
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../snowflake/struct.ProcessUniqueId.html' title='snowflake::ProcessUniqueId'>ProcessUniqueId</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; Self</code></h4>
 <div class='docblock'><p>Create a new unique ID.</p>
 
-<p><strong>panics</strong> if there are no more unique IDs available. If this happens, go home and reevaluate
-your threading model!</p>
+<p><strong>panics</strong> if there are no more unique IDs available. If this happens, go home and
+reevaluate your threading model!</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../snowflake/struct.ProcessUniqueId.html' title='snowflake::ProcessUniqueId'>ProcessUniqueId</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; Self</code></h4>
 </div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../snowflake/struct.ProcessUniqueId.html' title='snowflake::ProcessUniqueId'>ProcessUniqueId</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/hash/trait.Hash.html' title='core::hash::Hash'>Hash</a> for <a class='struct' href='../snowflake/struct.ProcessUniqueId.html' title='snowflake::ProcessUniqueId'>ProcessUniqueId</a></code></h3><div class='impl-items'><h4 id='method.hash' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash' class='fnname'>hash</a>&lt;__H: <a class='trait' href='https://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a>&gt;(&amp;self, __arg_0: &amp;mut __H)</code></h4>
