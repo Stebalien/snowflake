@@ -16,7 +16,8 @@ static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 fn next_global() -> usize {
     let mut prev = GLOBAL_COUNTER.load(Ordering::Relaxed);
     loop {
-        assert!(prev < usize::MAX, "Snow Crash: Go home and reevaluate your threading model!");
+        assert!(prev < usize::MAX,
+                "Snow Crash: Go home and reevaluate your threading model!");
         let old_value = GLOBAL_COUNTER.compare_and_swap(prev, prev + 1, Ordering::Relaxed);
         if old_value == prev {
             return prev;
@@ -40,7 +41,7 @@ thread_local! {
 /// 1. ID creation should be highly performant even on highly concurrent systems. It's MUCH faster
 ///    than using random/time based IDs (but, on the other hand, only unique within a process).
 /// 2. While this crate can run out of process unique IDs, this is very unlikely assuming a sane
-///    threading model and will panic rather than potentially reusing unique IDs. 
+///    threading model and will panic rather than potentially reusing unique IDs.
 ///
 /// # Limits
 ///
@@ -59,8 +60,8 @@ pub struct ProcessUniqueId {
 impl ProcessUniqueId {
     /// Create a new unique ID.
     ///
-    /// **panics** if there are no more unique IDs available. If this happens, go home and reevaluate
-    /// your threading model!
+    /// **panics** if there are no more unique IDs available. If this happens, go home and
+    /// reevaluate your threading model!
     #[inline]
     pub fn new() -> Self {
         NEXT_LOCAL_UNIQUE_ID.with(|unique_id| {
@@ -111,20 +112,29 @@ mod test {
     fn test_unique_id_unthreaded() {
         let first_unique_id = ProcessUniqueId::new();
         // Not going to be able to count to u64::MAX
-        { // Ignore....
+        {
+            // Ignore....
             use super::NEXT_LOCAL_UNIQUE_ID;
             NEXT_LOCAL_UNIQUE_ID.with(|unique_id| {
-                unsafe { (*unique_id.get()).offset = u64::MAX-10 }
+                unsafe { (*unique_id.get()).offset = u64::MAX - 10 }
             });
         } // Ignore...
 
-        for i in (u64::MAX-11)..(u64::MAX) {
-            assert!(ProcessUniqueId::new() == ProcessUniqueId { prefix: first_unique_id.prefix, offset: i+1});
+        for i in (u64::MAX - 11)..(u64::MAX) {
+            assert!(ProcessUniqueId::new() ==
+                    ProcessUniqueId {
+                prefix: first_unique_id.prefix,
+                offset: i + 1,
+            });
         }
         let next = ProcessUniqueId::new();
         assert!(next.prefix != first_unique_id.prefix);
         assert!(next.offset == 0);
-        assert!(ProcessUniqueId::new() == ProcessUniqueId { prefix: next.prefix, offset: 1 });
+        assert!(ProcessUniqueId::new() ==
+                ProcessUniqueId {
+            prefix: next.prefix,
+            offset: 1,
+        });
     }
 
     #[test]
@@ -139,11 +149,13 @@ mod test {
         }).collect();
 
         // Start them all at once.
-        for thread in &threads { thread.thread().unpark(); }
+        for thread in &threads {
+            thread.thread().unpark();
+        }
 
-        let mut results: Vec<_> = threads.into_iter().map(|t|{
-            t.join().unwrap()
-        }).collect();
+        let mut results: Vec<_> = threads.into_iter()
+                                         .map(|t| t.join().unwrap())
+                                         .collect();
         results.sort();
         let old_len = results.len();
         results.dedup();
