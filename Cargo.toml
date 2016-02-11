@@ -19,7 +19,7 @@ rand = "*"
 threadpool = "*"
 
 [dependencies.clippy]
-version = "*"
+version = "0"
 optional = true
 
 [features]
