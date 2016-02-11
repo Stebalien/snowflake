@@ -17,3 +17,10 @@ time = "*"
 uuid = "*"
 rand = "*"
 threadpool = "*"
+
+[dependencies.clippy]
+version = "*"
+optional = true
+
+[features]
+default=[]
