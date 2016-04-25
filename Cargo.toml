@@ -13,10 +13,10 @@ homepage = "https://github.com/Stebalien/snowflake"
 documentation = "https://stebalien.github.io/snowflake/snowflake"
 
 [dev-dependencies]
-time = "*"
-uuid = "*"
-rand = "*"
-threadpool = "*"
+time = "0.1"
+uuid = "0.1"
+rand = "0.3"
+threadpool = "0.2"
 
 [dependencies.clippy]
 version = "0"
