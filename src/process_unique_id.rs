@@ -10,6 +10,7 @@ use std::cell::UnsafeCell;
 use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
 use std::{u64, usize};
 use std::default::Default;
+use std::fmt;
 
 static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 
@@ -55,6 +56,12 @@ thread_local! {
 pub struct ProcessUniqueId {
     prefix: usize,
     offset: u64,
+}
+
+impl fmt::Display for ProcessUniqueId {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "puid-{:x}-{:x}", self.prefix, self.offset)
+    }
 }
 
 impl ProcessUniqueId {
