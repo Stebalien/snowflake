@@ -1,3 +1,4 @@
 language: rust
+cache: cargo
 rust:
   - nightly # Needed for testing (benchmarks). It actually works on stable.
