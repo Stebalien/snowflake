@@ -360,7 +360,7 @@
     <span class='doccomment'>/// **panics** if there are no more unique IDs available. If this happens, go home and</span>
     <span class='doccomment'>/// reevaluate your threading model!</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='ident'>NEXT_LOCAL_UNIQUE_ID</span>.<span class='ident'>with</span>(<span class='op'>|</span><span class='ident'>unique_id</span><span class='op'>|</span> {
             <span class='kw'>unsafe</span> {
                 <span class='comment'>// NOTE: Checked ops are slower than manually checking... (WTF?)</span>
@@ -384,7 +384,7 @@
 
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>ProcessUniqueId</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+    <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='self'>Self</span> {
         <span class='ident'>ProcessUniqueId</span>::<span class='ident'>new</span>()
     }
 }
