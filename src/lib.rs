@@ -12,9 +12,6 @@
 //! This crate currently includes guaranteed process unique IDs but may include new ID types in the
 //! future.
 
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
-
 mod process_unique_id;
 
 pub use process_unique_id::ProcessUniqueId;
