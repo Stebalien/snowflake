@@ -54,8 +54,8 @@ thread_local! {
 /// TL; DR: Don't create unique IDs from over 4 billion different threads on a 32bit system.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub struct ProcessUniqueId {
-    prefix: usize,
-    offset: u64,
+    pub prefix: usize,
+    pub offset: u64,
 }
 
 impl fmt::Display for ProcessUniqueId {
