@@ -52,7 +52,7 @@ thread_local! {
 /// IDs in a reasonable amount of time is to run a 32bit system, spawn 2^32 threads, and claim one
 /// ID on each thread. You might be able to do this on a 64bit system but it would take a while...
 /// TL; DR: Don't create unique IDs from over 4 billion different threads on a 32bit system.
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Deserialize, Serialize)]
 pub struct ProcessUniqueId {
     prefix: usize,
     offset: u64,
