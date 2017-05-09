@@ -12,7 +12,8 @@
 //! This crate currently includes guaranteed process unique IDs but may include new ID types in the
 //! future.
 
-#[macro_use] extern crate serde_derive;
+//#[cfg(feature = "serde")]
+//#[macro_use] extern crate serde_derive;
 
 mod process_unique_id;
 
