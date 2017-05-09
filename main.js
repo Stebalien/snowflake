@@ -34,7 +34,8 @@
                      "primitive",
                      "associatedtype",
                      "constant",
-                     "associatedconstant"];
+                     "associatedconstant",
+                     "union"];
 
     // used for special search precedence
     var TY_PRIMITIVE = itemTypes.indexOf("primitive");
@@ -122,6 +123,11 @@
         case "S":
             ev.preventDefault();
             focusSearchBar();
+            break;
+
+        case "+":
+            ev.preventDefault();
+            toggleAllDocs();
             break;
 
         case "?":
@@ -572,10 +578,6 @@
                         displayPath = item.path + '::';
                         href = rootPath + item.path.replace(/::/g, '/') + '/' +
                                name + '/index.html';
-                    } else if (type === 'static' || type === 'reexport') {
-                        displayPath = item.path + '::';
-                        href = rootPath + item.path.replace(/::/g, '/') +
-                               '/index.html';
                     } else if (type === "primitive") {
                         displayPath = "";
                         href = rootPath + item.path.replace(/::/g, '/') +
@@ -586,9 +588,14 @@
                     } else if (item.parent !== undefined) {
                         var myparent = item.parent;
                         var anchor = '#' + type + '.' + name;
-                        displayPath = item.path + '::' + myparent.name + '::';
+                        var parentType = itemTypes[myparent.ty];
+                        if (parentType === "primitive") {
+                            displayPath = myparent.name + '::';
+                        } else {
+                            displayPath = item.path + '::' + myparent.name + '::';
+                        }
                         href = rootPath + item.path.replace(/::/g, '/') +
-                               '/' + itemTypes[myparent.ty] +
+                               '/' + parentType +
                                '.' + myparent.name +
                                '.html' + anchor;
                     } else {
@@ -602,7 +609,7 @@
                               displayPath + '<span class="' + type + '">' +
                               name + '</span></a></td><td>' +
                               '<a href="' + href + '">' +
-                              '<span class="desc">' + item.desc +
+                              '<span class="desc">' + escape(item.desc) +
                               '&nbsp;</span></a></td></tr>';
                 });
             } else {
@@ -800,14 +807,6 @@
             search();
         }
 
-        function plainSummaryLine(markdown) {
-            markdown.replace(/\n/g, ' ')
-            .replace(/'/g, "\'")
-            .replace(/^#+? (.+?)/, "$1")
-            .replace(/\[(.*?)\]\(.*?\)/g, "$1")
-            .replace(/\[(.*?)\]\[.*?\]/g, "$1");
-        }
-
         index = buildIndex(rawSearchIndex);
         startSearch();
 
@@ -829,13 +828,10 @@
                 if (crates[i] === window.currentCrate) {
                     klass += ' current';
                 }
-                if (rawSearchIndex[crates[i]].items[0]) {
-                    var desc = rawSearchIndex[crates[i]].items[0][3];
-                    var link = $('<a>', {'href': '../' + crates[i] + '/index.html',
-                                         'title': plainSummaryLine(desc),
-                                         'class': klass}).text(crates[i]);
-                    ul.append($('<li>').append(link));
-                }
+                var link = $('<a>', {'href': '../' + crates[i] + '/index.html',
+                                     'title': rawSearchIndex[crates[i]].doc,
+                                     'class': klass}).text(crates[i]);
+                ul.append($('<li>').append(link));
             }
             sidebar.append(div);
         }
@@ -879,12 +875,16 @@
             sidebar.append(div);
         }
 
+        block("primitive", "Primitive Types");
         block("mod", "Modules");
+        block("macro", "Macros");
         block("struct", "Structs");
         block("enum", "Enums");
+        block("constant", "Constants");
+        block("static", "Statics");
         block("trait", "Traits");
         block("fn", "Functions");
-        block("macro", "Macros");
+        block("type", "Type Definitions");
     }
 
     window.initSidebarItems = initSidebarItems;
@@ -912,15 +912,6 @@
         window.register_implementors(window.pending_implementors);
     }
 
-    // See documentation in html/render.rs for what this is doing.
-    var query = getQueryStringParams();
-    if (query['gotosrc']) {
-        window.location = $('#src-' + query['gotosrc']).attr('href');
-    }
-    if (query['gotomacrosrc']) {
-        window.location = $('.srclink').attr('href');
-    }
-
     function labelForToggleButton(sectionIsCollapsed) {
         if (sectionIsCollapsed) {
             // button will expand the section
@@ -931,7 +922,7 @@
         return "\u2212"; // "\u2212" is '−' minus sign
     }
 
-    $("#toggle-all-docs").on("click", function() {
+    function toggleAllDocs() {
         var toggle = $("#toggle-all-docs");
         if (toggle.hasClass("will-expand")) {
             toggle.removeClass("will-expand");
@@ -950,20 +941,31 @@
             $(".toggle-wrapper").addClass("collapsed");
             $(".collapse-toggle").children(".inner").text(labelForToggleButton(true));
         }
-    });
+    }
 
-    $(document).on("click", ".collapse-toggle", function() {
-        var toggle = $(this);
+    function collapseDocs(toggle, animate) {
         var relatedDoc = toggle.parent().next();
         if (relatedDoc.is(".stability")) {
             relatedDoc = relatedDoc.next();
         }
         if (relatedDoc.is(".docblock")) {
             if (relatedDoc.is(":visible")) {
-                relatedDoc.slideUp({duration: 'fast', easing: 'linear'});
-                toggle.parent(".toggle-wrapper").addClass("collapsed");
-                toggle.children(".inner").text(labelForToggleButton(true));
-                toggle.children(".toggle-label").fadeIn();
+                if (animate === true) {
+                    relatedDoc.slideUp({
+                        duration: 'fast',
+                        easing: 'linear',
+                        complete: function() {
+                            toggle.children(".toggle-label").fadeIn();
+                            toggle.parent(".toggle-wrapper").addClass("collapsed");
+                            toggle.children(".inner").text(labelForToggleButton(true));
+                        },
+                    });
+                } else {
+                    relatedDoc.hide();
+                    toggle.children(".toggle-label").show();
+                    toggle.parent(".toggle-wrapper").addClass("collapsed");
+                    toggle.children(".inner").text(labelForToggleButton(true));
+                }
             } else {
                 relatedDoc.slideDown({duration: 'fast', easing: 'linear'});
                 toggle.parent(".toggle-wrapper").removeClass("collapsed");
@@ -971,6 +973,12 @@
                 toggle.children(".toggle-label").hide();
             }
         }
+    }
+
+    $("#toggle-all-docs").on("click", toggleAllDocs);
+
+    $(document).on("click", ".collapse-toggle", function() {
+        collapseDocs($(this), true)
     });
 
     $(function() {
@@ -978,7 +986,7 @@
             .html("[<span class='inner'></span>]");
         toggle.children(".inner").text(labelForToggleButton(false));
 
-        $(".method").each(function() {
+        $(".method, .impl-items > .associatedconstant").each(function() {
             if ($(this).next().is(".docblock") ||
                 ($(this).next().is(".stability") && $(this).next().next().is(".docblock"))) {
                     $(this).children().last().after(toggle.clone());
@@ -986,12 +994,38 @@
         });
 
         var mainToggle =
-            $(toggle).append(
+            $(toggle.clone()).append(
                 $('<span/>', {'class': 'toggle-label'})
                     .css('display', 'none')
                     .html('&nbsp;Expand&nbsp;description'));
         var wrapper = $("<div class='toggle-wrapper'>").append(mainToggle);
         $("#main > .docblock").before(wrapper);
+
+        $(".docblock.autohide").each(function() {
+            var wrap = $(this).prev();
+            if (wrap.is(".toggle-wrapper")) {
+                var toggle = wrap.children().first();
+                if ($(this).children().first().is("h3")) {
+                    toggle.children(".toggle-label")
+                          .text(" Show " + $(this).children().first().text());
+                }
+                $(this).hide();
+                wrap.addClass("collapsed");
+                toggle.children(".inner").text(labelForToggleButton(true));
+                toggle.children(".toggle-label").show();
+            }
+        });
+
+        var mainToggle =
+            $(toggle).append(
+                $('<span/>', {'class': 'toggle-label'})
+                    .css('display', 'none')
+                    .html('&nbsp;Expand&nbsp;attributes'));
+        var wrapper = $("<div class='toggle-wrapper toggle-attributes'>").append(mainToggle);
+        $("#main > pre > .attributes").each(function() {
+            $(this).before(wrapper);
+            collapseDocs($($(this).prev().children()[0]), false);
+        });
     });
 
     $('pre.line-numbers').on('click', 'span', function() {
