@@ -24,3 +24,5 @@ threadpool = "0.2"
 
 [features]
 default=[]
+
+serde = ["serde_derive"]
