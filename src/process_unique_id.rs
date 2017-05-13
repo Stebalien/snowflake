@@ -53,6 +53,7 @@ thread_local! {
 /// ID on each thread. You might be able to do this on a 64bit system but it would take a while...
 /// TL; DR: Don't create unique IDs from over 4 billion different threads on a 32bit system.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+#[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
 pub struct ProcessUniqueId {
     prefix: usize,
     offset: u64,

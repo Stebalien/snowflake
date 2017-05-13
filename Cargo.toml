@@ -12,6 +12,10 @@ repository = "https://github.com/Stebalien/snowflake"
 homepage = "https://github.com/Stebalien/snowflake"
 documentation = "https://stebalien.github.io/snowflake/snowflake"
 
+[dependencies]
+serde = { version = "1.0", optional = true }
+serde_derive = { version = "1.0", optional = true }
+
 [dev-dependencies]
 time = "0.1"
 uuid = "0.1"
@@ -20,3 +24,5 @@ threadpool = "0.2"
 
 [features]
 default=[]
+
+serde_support = ["serde", "serde_derive"]
