@@ -55,8 +55,8 @@ thread_local! {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
 pub struct ProcessUniqueId {
-    prefix: usize,
-    offset: u64,
+    pub prefix: usize,
+    pub offset: u64,
 }
 
 impl fmt::Display for ProcessUniqueId {
