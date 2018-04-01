@@ -7,18 +7,20 @@
 // except according to those terms.
 use std::cell::UnsafeCell;
 
-use std::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
-use std::{u64, usize};
 use std::default::Default;
 use std::fmt;
+use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
+use std::{usize, u64};
 
 static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 
 fn next_global() -> usize {
     let mut prev = GLOBAL_COUNTER.load(Ordering::Relaxed);
     loop {
-        assert!(prev < usize::MAX,
-                "Snow Crash: Go home and reevaluate your threading model!");
+        assert!(
+            prev < usize::MAX,
+            "Snow Crash: Go home and reevaluate your threading model!"
+        );
         let old_value = GLOBAL_COUNTER.compare_and_swap(prev, prev + 1, Ordering::Relaxed);
         if old_value == prev {
             return prev;
@@ -102,16 +104,16 @@ impl Default for ProcessUniqueId {
 
 #[cfg(test)]
 mod test {
+    extern crate rand;
     extern crate test;
+    extern crate threadpool;
     extern crate time;
     extern crate uuid;
-    extern crate rand;
-    extern crate threadpool;
-    use self::threadpool::ThreadPool;
-    use std::thread;
-    use std::sync::mpsc::channel;
     use self::test::Bencher;
+    use self::threadpool::ThreadPool;
     use super::{next_global, ProcessUniqueId};
+    use std::sync::mpsc::channel;
+    use std::thread;
     use std::u64;
 
     // Glass box tests.
@@ -123,47 +125,48 @@ mod test {
         {
             // Ignore....
             use super::NEXT_LOCAL_UNIQUE_ID;
-            NEXT_LOCAL_UNIQUE_ID.with(|unique_id| {
-                unsafe { (*unique_id.get()).offset = u64::MAX - 10 }
-            });
+            NEXT_LOCAL_UNIQUE_ID
+                .with(|unique_id| unsafe { (*unique_id.get()).offset = u64::MAX - 10 });
         } // Ignore...
 
         for i in (u64::MAX - 11)..(u64::MAX) {
-            assert!(ProcessUniqueId::new() ==
-                    ProcessUniqueId {
-                prefix: first_unique_id.prefix,
-                offset: i + 1,
-            });
+            assert!(
+                ProcessUniqueId::new() == ProcessUniqueId {
+                    prefix: first_unique_id.prefix,
+                    offset: i + 1,
+                }
+            );
         }
         let next = ProcessUniqueId::new();
         assert!(next.prefix != first_unique_id.prefix);
         assert!(next.offset == 0);
-        assert!(ProcessUniqueId::new() ==
-                ProcessUniqueId {
-            prefix: next.prefix,
-            offset: 1,
-        });
+        assert!(
+            ProcessUniqueId::new() == ProcessUniqueId {
+                prefix: next.prefix,
+                offset: 1,
+            }
+        );
     }
 
     #[test]
     fn test_unique_id_threaded() {
-        let threads: Vec<_> = (0..10).map(|_| {
-            thread::spawn(move || {
-                thread::park();
-                let unique_id = ProcessUniqueId::new();
-                assert_eq!(unique_id.offset, 0);
-                unique_id.prefix
+        let threads: Vec<_> = (0..10)
+            .map(|_| {
+                thread::spawn(move || {
+                    thread::park();
+                    let unique_id = ProcessUniqueId::new();
+                    assert_eq!(unique_id.offset, 0);
+                    unique_id.prefix
+                })
             })
-        }).collect();
+            .collect();
 
         // Start them all at once.
         for thread in &threads {
             thread.thread().unpark();
         }
 
-        let mut results: Vec<_> = threads.into_iter()
-                                         .map(|t| t.join().unwrap())
-                                         .collect();
+        let mut results: Vec<_> = threads.into_iter().map(|t| t.join().unwrap()).collect();
         results.sort();
         let old_len = results.len();
         results.dedup();

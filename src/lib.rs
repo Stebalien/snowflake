@@ -13,7 +13,8 @@
 //! future.
 
 #[cfg(feature = "serde_support")]
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate serde_derive;
 
 mod process_unique_id;
 
