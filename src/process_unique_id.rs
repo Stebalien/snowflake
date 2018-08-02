@@ -113,11 +113,20 @@ mod test {
     use self::test::Bencher;
     use self::threadpool::ThreadPool;
     use super::{next_global, ProcessUniqueId};
+    use std::mem::size_of;
     use std::sync::mpsc::channel;
     use std::thread;
     use std::u64;
 
     // Glass box tests.
+
+    #[test]
+    fn test_non_zero() {
+        assert_eq!(
+            size_of::<Option<ProcessUniqueId>>(),
+            size_of::<ProcessUniqueId>()
+        )
+    }
 
     #[test]
     fn test_unique_id_unthreaded() {
