@@ -10,7 +10,7 @@ use std::cell::UnsafeCell;
 use std::default::Default;
 use std::fmt;
 use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
-use std::{usize, u64};
+use std::{u64, usize};
 
 static GLOBAL_COUNTER: AtomicUsize = ATOMIC_USIZE_INIT;
 
@@ -158,8 +158,7 @@ mod test {
                     assert_eq!(unique_id.offset, 0);
                     unique_id.prefix
                 })
-            })
-            .collect();
+            }).collect();
 
         // Start them all at once.
         for thread in &threads {
