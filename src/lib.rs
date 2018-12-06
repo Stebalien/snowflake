@@ -18,4 +18,4 @@ extern crate serde_derive;
 
 mod process_unique_id;
 
-pub use process_unique_id::ProcessUniqueId;
+pub use crate::process_unique_id::ProcessUniqueId;
