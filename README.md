@@ -20,7 +20,7 @@ snowflake = "1.2"
 and this to your create root:
 
 ```rust
-extern create snowflake;
+extern crate snowflake;
 ```
 
 To add support for serialization and deserialization using
