@@ -34,6 +34,18 @@ snowflake = { version = "1.2", features = ["serde_support"] }
 Warning: there is a risk of non-unique IDs if (de)serialization is used to
 persist IDs, i.e. reading and writing IDs to and from a file.
 
+## Getting Started
+
+```rust
+use snowflake::ProcessUniqueId;
+
+fn main() {
+  let id1 = ProcessUniqueId::new();
+  let id2 = ProcessUniqueId::new();
+  println!("{}", id2);
+}
+```
+
 ## License
 
 Licensed under either of
