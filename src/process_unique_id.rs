@@ -9,6 +9,7 @@ use std::cell::UnsafeCell;
 
 use std::default::Default;
 use std::fmt;
+use std::num::NonZeroUsize;
 use std::sync::atomic::{AtomicUsize, Ordering, ATOMIC_USIZE_INIT};
 use std::{u64, usize};
 
@@ -23,7 +24,7 @@ fn next_global() -> usize {
         );
         let old_value = GLOBAL_COUNTER.compare_and_swap(prev, prev + 1, Ordering::Relaxed);
         if old_value == prev {
-            return prev;
+            return prev + 1;
         } else {
             prev = old_value;
         }
@@ -33,7 +34,7 @@ fn next_global() -> usize {
 // NOTE: We could use a Cell (not unsafe) but this is slightly faster.
 thread_local! {
     static NEXT_LOCAL_UNIQUE_ID: UnsafeCell<ProcessUniqueId> = UnsafeCell::new(ProcessUniqueId {
-        prefix: next_global(),
+        prefix: unsafe { NonZeroUsize::new_unchecked(next_global()) },
         offset: 0
     })
 }
@@ -57,7 +58,7 @@ thread_local! {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
 pub struct ProcessUniqueId {
-    prefix: usize,
+    prefix: NonZeroUsize,
     offset: u64,
 }
 
@@ -80,7 +81,7 @@ impl ProcessUniqueId {
                 let next_unique_id = *unique_id.get();
                 (*unique_id.get()) = if next_unique_id.offset == u64::MAX {
                     ProcessUniqueId {
-                        prefix: next_global(),
+                        prefix: NonZeroUsize::new_unchecked(next_global()),
                         offset: 0,
                     }
                 } else {
@@ -112,11 +113,20 @@ mod test {
     use self::test::Bencher;
     use self::threadpool::ThreadPool;
     use super::{next_global, ProcessUniqueId};
+    use std::mem::size_of;
     use std::sync::mpsc::channel;
     use std::thread;
     use std::u64;
 
     // Glass box tests.
+
+    #[test]
+    fn test_non_zero() {
+        assert_eq!(
+            size_of::<Option<ProcessUniqueId>>(),
+            size_of::<ProcessUniqueId>()
+        )
+    }
 
     #[test]
     fn test_unique_id_unthreaded() {
